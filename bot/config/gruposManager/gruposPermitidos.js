@@ -1,0 +1,2 @@
+//GRUPOS PERMITIDOS
+module.exports = [-1002036028228];
