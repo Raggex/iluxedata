@@ -35,4 +35,16 @@ async function getDNIVirtual(dni) {
   }
 }
 
-module.exports = { api_Reniec, getDNIVirtual };
+async function seekerApi_pdf(dni) {
+  const apiUrl = `http://161.132.49.224:1240/seeker?dni=${dni}`;
+
+  try {
+    const response = await axios.get(apiUrl);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.log("Error en la API SEEKER-PDF: ", error);
+  }
+}
+
+module.exports = { api_Reniec, getDNIVirtual, seekerApi_pdf };
