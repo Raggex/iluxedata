@@ -2,11 +2,11 @@ const { promisePool } = require("./connection");
 
 // Función para registrar un nuevo usuario
 const registrarUsuario = (userid, nombre) => {
-  const query = "INSERT INTO usuarios (userid, nombre, rango) VALUES (?, ?, 'FREE')";
+  const query = "INSERT INTO usuarios (userid, nombre, rango, creditos) VALUES (?, ?, 'FREE', 3)";
   return promisePool.execute(query, [userid, nombre])
     .then(() => {
-      console.log(`Usuario ${nombre}, con el ID ${userid} registrado correctamente.`);
-      return "Usuario registrado correctamente";
+      console.log(`Usuario ${nombre}, con el ID ${userid} registrado correctamente con 3 créditos.`);
+      return "Usuario registrado correctamente con 3 créditos";
     })
     .catch(err => {
       throw new Error("Error registrando usuario: " + err.message);

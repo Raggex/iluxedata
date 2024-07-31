@@ -30,10 +30,10 @@ module.exports = (bot) => {
         // SE REGISTRA...
         await registrarUsuario(userid, name);
 
-        const yx = `Felicidades, ha sido registrado`;
+        const yx = `[〽️] REGISTRO EXITOSO, SE TE CARGO 3 CREDITOS DE BIENVENIDA`;
         bot.sendMessage(chatid, yx, messageOptions);
       } else {
-        const yx = `Usted ya está registrado. Fecha de registro: ${verificacion.date}`;
+        const yx = `🚫 UPS, YA TE ENCUENTRAS REGISTRADO, UTILIZA /me PARA VISUALIZAR TU PERFIL.`;
         bot.sendMessage(chatid, yx, messageOptions);
       }
     } catch (error) {
