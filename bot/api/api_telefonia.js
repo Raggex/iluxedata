@@ -39,4 +39,24 @@ async function titularClaro(tel) {
   }
 }
 
-module.exports = { validarOp, titularClaro };
+async function titularBitel(tel) {
+  const apiUrl = `  http://161.132.48.228:8040/bitlive?num=${tel}`;
+
+  try {
+    const responseClaro = await axios.get(apiUrl);
+
+    if (responseClaro.status !== 200) {
+      throw new Error(
+        "Error al obtener la información de la api CLARO: ",
+        responseClaro.status
+      );
+    }
+
+    const data = responseClaro.data;
+    return data;
+  } catch (error) {
+    console.log("Error en la api Claro: ", error);
+  }
+}
+
+module.exports = { validarOp, titularClaro, titularBitel };

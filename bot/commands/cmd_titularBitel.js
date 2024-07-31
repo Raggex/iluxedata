@@ -1,5 +1,5 @@
 // VALIDACIONES
-const { validarOp, titularClaro } = require("../api/api_telefonia");
+const { validarOp, titularBitel } = require("../api/api_telefonia");
 // VERIFICACIONES
 const { veriRegistro } = require("../config/fx/verificarRegistro");
 const { veriCreditos } = require("../config/fx/verificarCreditos");
@@ -14,7 +14,7 @@ const {
 
 const ANTISPAM = 50;
 const CREDITS = 10;
-const name_Comando = /\/clax (.+)/;
+const name_Comando = /\/bitel (.+)/;
 
 module.exports = (bot) => {
   //POLLING ERROR
@@ -108,40 +108,47 @@ module.exports = (bot) => {
 
         const datosNum = validarOperador.operador;
 
-        if (datosNum !== "Claro") {
-          let yxx = `❰ 👺 ❱ La operadora no es CLARO.`;
+        if (datosNum !== "Bitel") {
+          let yxx = `❰ 👺 ❱ La operadora no es BITEL.`;
           await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
           return bot.sendMessage(chatId, yxx, messageOptions);
         }
 
-        const data = await titularClaro(tel);
+        const responseBitel = await titularBitel(tel);
 
-        const dni = data.result.documento;
-        const titular = data.result.nombres + data.result.apellidos;
-        const correo = data.result.correo;
-        const plan = data.result.plan;
+        const data = responseBitel.response;
+        const documento = data.nuDni;
+        const nombre = data.Titular;
+        const nacionalidad = data.infTitular.Nacionalidad;
+        const Fecha_Activacion = data.fechActivacion;
+        const Hora_Activacion = data.hrActivacion;
+        const Tipo_Plan = data.tipPlan;
 
-        let mssg = `*❰* #IluxeD4taADV *❱ → CLARO*
-        
-*DOCUMENTO* → ${dni}
-*TITULAR* → ${titular}
-*NOMBRES* → ${correo}
-*PLAN* → ${plan}
-
-*BUSCADO POR* →  ${userId}
-        `;
+        let mssg = `❰ #IluxeD4taADV ❱ → BITEL\n\n`;
+        mssg += `DOCUMENTO → ${documento}\n`;
+        mssg += `NOMBRE → ${nombre}\n`;
+        mssg += `NACIONALIDAD → ${nacionalidad}\n`;
+        mssg += `ACTIVACION → ${Fecha_Activacion} - ${Hora_Activacion}\n`;
+        mssg += `PLAN → ${Tipo_Plan}\n\n`;
+        mssg += `BUSCADO POR → ${userId}\n`;
 
         await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
-        bot.sendMessage(chatId, mssg, messageOptions).then(async () => {
+        bot.sendMessage(chatId, mssg).then(async () => {
+          console.log(msg);
+
           restarCreditos(userId, 3);
           activarAntiSpam(userId, ANTISPAM);
         });
       } catch (error) {}
     } catch (error) {
       console.log(error);
-      bot.sendMessage(chatId, "❰ 💀 ❱ Error en la fuente interna.", messageOptions);
+      bot.sendMessage(
+        chatId,
+        "❰ 💀 ❱ Error en la fuente interna.",
+        messageOptions
+      );
     }
   });
 };
