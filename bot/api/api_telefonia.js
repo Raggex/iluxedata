@@ -59,4 +59,50 @@ async function titularBitel(tel) {
   }
 }
 
-module.exports = { validarOp, titularClaro, titularBitel };
+async function titularEntel(tel) {
+  const apiUrl = `http://161.132.48.30:4010/mx1Nb1YcNP4DzWYMiYn72oPoT4i6N/numero/${tel}`;
+
+  try {
+    const responseClaro = await axios.get(apiUrl);
+
+    // if (responseClaro.status !== 200) {
+    //   throw new Error(
+    //     "Error al obtener la información de la api CLARO: ",
+    //     responseClaro.status
+    //   );
+    // }
+
+    const data = responseClaro.data;
+    return data;
+  } catch (error) {
+    console.log("Error en la api Claro: ", error);
+  }
+}
+
+async function titularMov(tel) {
+  const apiUrl = `http://161.132.55.243:4010/numero/${tel}`;
+
+  try {
+    const responseClaro = await axios.get(apiUrl);
+
+    // if (responseClaro.status !== 200) {
+    //   throw new Error(
+    //     "Error al obtener la información de la api CLARO: ",
+    //     responseClaro.status
+    //   );
+    // }
+
+    const data = responseClaro.data;
+    return data;
+  } catch (error) {
+    console.log("Error en la api Claro: ", error);
+  }
+}
+
+module.exports = {
+  validarOp,
+  titularClaro,
+  titularBitel,
+  titularEntel,
+  titularMov,
+};

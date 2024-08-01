@@ -1,5 +1,5 @@
 // VALIDACIONES
-const { validarOp, titularBitel } = require("../api/api_telefonia");
+const { validarOp, titularMov } = require("../api/api_telefonia");
 // VERIFICACIONES
 const { veriRegistro } = require("../config/fx/verificarRegistro");
 const { veriCreditos } = require("../config/fx/verificarCreditos");
@@ -14,7 +14,7 @@ const {
 
 const ANTISPAM = 50;
 const CREDITS = 5;
-const name_Comando = /\/bitel (.+)/;
+const name_Comando = /\/movistar (.+)/;
 
 module.exports = (bot) => {
   //POLLING ERROR
@@ -107,41 +107,51 @@ module.exports = (bot) => {
         }
 
         const datosNum = validarOperador.operador;
+        console.log(validarOperador);
 
-        if (datosNum !== "Bitel") {
-          let yxx = `❰ 👺 ❱ La operadora no es BITEL.`;
+        if (datosNum !== "Movistar") {
+          let yxx = `❰ 👺 ❱ La operadora no es MOVISTAR.`;
           await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
           return bot.sendMessage(chatId, yxx, messageOptions);
         }
 
-        const responseBitel = await titularBitel(tel);
+        const responseMov = await titularMov(tel);
 
-        const data = responseBitel.response;
-        const documento = data.nuDni;
-        const nombre = data.Titular;
-        const nacionalidad = data.infTitular.Nacionalidad;
-        const Fecha_Activacion = data.fechActivacion;
-        const Hora_Activacion = data.hrActivacion;
-        const Tipo_Plan = data.tipPlan;
+        const dataMovistar = responseMov[0];
 
-        let mssg = `❰ #IluxeD4taADV ❱ → BITEL\n\n`;
-        mssg += `DOCUMENTO → ${documento}\n`;
-        mssg += `NOMBRE → ${nombre}\n`;
-        mssg += `NACIONALIDAD → ${nacionalidad}\n`;
-        mssg += `ACTIVACION → ${Fecha_Activacion} - ${Hora_Activacion}\n`;
-        mssg += `PLAN → ${Tipo_Plan}\n\n`;
-        mssg += `BUSCADO POR → ${userId}\n`;
+        //DATOS MOVISTAR
+        const tipoProducto = dataMovistar.tipoProducto;
+        const modo = dataMovistar.modo;
+        const plan = dataMovistar.plan;
+        const imei = dataMovistar.numImei;
+        const titular = dataMovistar.nomTitular;
+        const tecnologia = dataMovistar.desTecnologia;
+        const tipProducto = dataMovistar.tipProducto;
+        const feCompra = dataMovistar.celInfo.feCompra;
+
+        let mssg = `*❰* #IluxeD4taADV *❱ → MOVISTAR*
+        
+*TITULAR* → ${titular}
+*TECNOLOGIA* → ${tecnologia}
+*COMPRA* → ${feCompra}
+*TIPO* → ${tipProducto}
+*PLAN* → ${plan}
+*MODO* → ${modo}
+*IMEI* → ${imei}
+
+*BUSCADO POR* →  ${userId}
+        `;
 
         await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
-        bot.sendMessage(chatId, mssg).then(async () => {
-          console.log(msg);
-
+        bot.sendMessage(chatId, mssg, messageOptions).then(async () => {
           restarCreditos(userId, CREDITS);
           activarAntiSpam(userId, ANTISPAM);
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.log(error);
       bot.sendMessage(

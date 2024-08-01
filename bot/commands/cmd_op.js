@@ -1,5 +1,5 @@
 // VALIDACIONES
-const { validarOp, titularBitel } = require("../api/api_telefonia");
+const { validarOp } = require("../api/api_telefonia");
 // VERIFICACIONES
 const { veriRegistro } = require("../config/fx/verificarRegistro");
 const { veriCreditos } = require("../config/fx/verificarCreditos");
@@ -13,8 +13,8 @@ const {
 } = require("../config/fx/fx_antispam");
 
 const ANTISPAM = 50;
-const CREDITS = 5;
-const name_Comando = /\/bitel (.+)/;
+const CREDITS = 1;
+const name_Comando = /\/op (.+)/;
 
 module.exports = (bot) => {
   //POLLING ERROR
@@ -106,42 +106,39 @@ module.exports = (bot) => {
           return bot.sendMessage(chatId, yxx, messageOptions);
         }
 
-        const datosNum = validarOperador.operador;
-
-        if (datosNum !== "Bitel") {
-          let yxx = `❰ 👺 ❱ La operadora no es BITEL.`;
+        if (validarOperador.message === `no encontrado. puede que sea entel`) {
           await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
-          return bot.sendMessage(chatId, yxx, messageOptions);
+          bot
+            .sendMessage(chatId, `❰ 🤖 ❱ La operadora es ENTEL`, messageOptions)
+            .then(async () => {
+              restarCreditos(userId, 3);
+              activarAntiSpam(userId, ANTISPAM);
+            });
+        } else {
+          const datosNum = validarOperador.operador;
+          console.log(validarOperador);
+          await bot.deleteMessage(chatId, consultandoMessage.message_id);
+
+          bot
+            .sendMessage(
+              chatId,
+              `❰ 🤖 ❱ La operadora es ${datosNum}`,
+              messageOptions
+            )
+            .then(async () => {
+              restarCreditos(userId, CREDITS);
+              activarAntiSpam(userId, ANTISPAM);
+            });
         }
-
-        const responseBitel = await titularBitel(tel);
-
-        const data = responseBitel.response;
-        const documento = data.nuDni;
-        const nombre = data.Titular;
-        const nacionalidad = data.infTitular.Nacionalidad;
-        const Fecha_Activacion = data.fechActivacion;
-        const Hora_Activacion = data.hrActivacion;
-        const Tipo_Plan = data.tipPlan;
-
-        let mssg = `❰ #IluxeD4taADV ❱ → BITEL\n\n`;
-        mssg += `DOCUMENTO → ${documento}\n`;
-        mssg += `NOMBRE → ${nombre}\n`;
-        mssg += `NACIONALIDAD → ${nacionalidad}\n`;
-        mssg += `ACTIVACION → ${Fecha_Activacion} - ${Hora_Activacion}\n`;
-        mssg += `PLAN → ${Tipo_Plan}\n\n`;
-        mssg += `BUSCADO POR → ${userId}\n`;
-
-        await bot.deleteMessage(chatId, consultandoMessage.message_id);
-
-        bot.sendMessage(chatId, mssg).then(async () => {
-          console.log(msg);
-
-          restarCreditos(userId, CREDITS);
-          activarAntiSpam(userId, ANTISPAM);
-        });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+        bot.sendMessage(
+          chatId,
+          "❰ 💀 ❱ Error en la fuente interna.",
+          messageOptions
+        );
+      }
     } catch (error) {
       console.log(error);
       bot.sendMessage(

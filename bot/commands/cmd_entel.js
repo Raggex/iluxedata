@@ -1,5 +1,4 @@
-// VALIDACIONES
-const { validarOp, titularBitel } = require("../api/api_telefonia");
+const { validarOp, titularEntel } = require("../api/api_telefonia");
 // VERIFICACIONES
 const { veriRegistro } = require("../config/fx/verificarRegistro");
 const { veriCreditos } = require("../config/fx/verificarCreditos");
@@ -13,8 +12,8 @@ const {
 } = require("../config/fx/fx_antispam");
 
 const ANTISPAM = 50;
-const CREDITS = 5;
-const name_Comando = /\/bitel (.+)/;
+const CREDITS = 10;
+const name_Comando = /\/entel (.+)/;
 
 module.exports = (bot) => {
   //POLLING ERROR
@@ -97,8 +96,9 @@ module.exports = (bot) => {
       );
 
       try {
+        console.log("Validando operador...");
         const validarOperador = await validarOp(tel);
-
+        console.log("Resultado de validación de operador:", validarOperador);
         if (validarOperador.status === "resolverCapcha") {
           let yxx = `❰ 👺 ❱ Capcha no resuelto intenta más tarde.`;
           await bot.deleteMessage(chatId, consultandoMessage.message_id);
@@ -106,42 +106,56 @@ module.exports = (bot) => {
           return bot.sendMessage(chatId, yxx, messageOptions);
         }
 
-        const datosNum = validarOperador.operador;
+        const datosNum = validarOperador.message;
 
-        if (datosNum !== "Bitel") {
-          let yxx = `❰ 👺 ❱ La operadora no es BITEL.`;
+        if (datosNum !== "no encontrado. puede que sea entel") {
+          let yxx = `❰ 👺 ❱ La operadora no es ENTEL.`;
           await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
           return bot.sendMessage(chatId, yxx, messageOptions);
         }
 
-        const responseBitel = await titularBitel(tel);
+        const res = await titularEntel(tel);
+        console.log(res);
+        const data = res.daSource;
+        const dni = data.nuDni;
+        const nomModelo = data.nomModelo;
+        const plan = data.nomPlan;
+        const feActivacion = data.feActivacion;
+        const feRegistro = data.feRegistro;
+        const nuImei = data.nuImei;
 
-        const data = responseBitel.response;
-        const documento = data.nuDni;
-        const nombre = data.Titular;
-        const nacionalidad = data.infTitular.Nacionalidad;
-        const Fecha_Activacion = data.fechActivacion;
-        const Hora_Activacion = data.hrActivacion;
-        const Tipo_Plan = data.tipPlan;
+        let mssg = `*❰* #IluxeD4taADV *❱ → ENTEL*
+        
+*DOCUMENTO* → ${dni}
+*MODELO* → ${nomModelo}
+*ACTIVACION* → ${feActivacion}
+*REGISTRO* → ${feRegistro}
+*IMEI* → ${nuImei}
+*PLAN* → ${plan}
 
-        let mssg = `❰ #IluxeD4taADV ❱ → BITEL\n\n`;
-        mssg += `DOCUMENTO → ${documento}\n`;
-        mssg += `NOMBRE → ${nombre}\n`;
-        mssg += `NACIONALIDAD → ${nacionalidad}\n`;
-        mssg += `ACTIVACION → ${Fecha_Activacion} - ${Hora_Activacion}\n`;
-        mssg += `PLAN → ${Tipo_Plan}\n\n`;
-        mssg += `BUSCADO POR → ${userId}\n`;
+*BUSCADO POR* →  ${userId}\n`;
+
+        // Restar créditos y obtener el saldo actualizado
+        await restarCreditos(userId, 3);
+        const nucreds = await obtenerCreditos(userId);
+
+        // Añadir los créditos restantes al mensaje
+        mssg += `*CREDITOS* → ${nucreds}`;
 
         await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
-        bot.sendMessage(chatId, mssg).then(async () => {
-          console.log(msg);
-
-          restarCreditos(userId, CREDITS);
+        bot.sendMessage(chatId, mssg, messageOptions).then(() => {
           activarAntiSpam(userId, ANTISPAM);
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+        bot.sendMessage(
+          chatId,
+          "❰ 💀 ❱ Error en la fuente interna.",
+          messageOptions
+        );
+      }
     } catch (error) {
       console.log(error);
       bot.sendMessage(

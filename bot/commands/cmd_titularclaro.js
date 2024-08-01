@@ -13,7 +13,7 @@ const {
 } = require("../config/fx/fx_antispam");
 
 const ANTISPAM = 50;
-const CREDITS = 10;
+const CREDITS = 5;
 const name_Comando = /\/clax (.+)/;
 
 module.exports = (bot) => {
@@ -135,7 +135,7 @@ module.exports = (bot) => {
         await bot.deleteMessage(chatId, consultandoMessage.message_id);
 
         bot.sendMessage(chatId, mssg, messageOptions).then(async () => {
-          restarCreditos(userId, 3);
+          restarCreditos(userId, CREDITS);
           activarAntiSpam(userId, ANTISPAM);
         });
       } catch (error) {}
