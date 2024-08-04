@@ -54,7 +54,7 @@ module.exports = (bot) => {
 
     // BOTON - CFG
     messageId = msg.message_id; // PRIMER MSG - ID
-    console.log("PRIMER ID DE MENSAJE...", messageId);
+    // console.log("PRIMER ID DE MENSAJE...", messageId);
 
     comandoInvocado[userId] = messageId + 1;
 
@@ -68,7 +68,7 @@ module.exports = (bot) => {
       })
       .then((sentMessage) => {
         photoMessageId = sentMessage.message_id;
-        console.log("ID del mensaje con foto:", photoMessageId);
+        // console.log("ID del mensaje con foto:", photoMessageId);
       })
       .catch((error) => {
         console.error("Error al enviar la foto:", error);
@@ -84,9 +84,9 @@ module.exports = (bot) => {
     const chatId = query.message.chat.id;
     const first_name = query.from.firstName;
 
-    console.log("query_id:", query_id);
-    console.log("query_messageId:", query_messageId);
-    console.log("chatId:", chatId);
+    // console.log("query_id:", query_id);
+    // console.log("query_messageId:", query_messageId);
+    // console.log("chatId:", chatId);
 
     const actions = [
       "boton_Reniec",
@@ -98,11 +98,72 @@ module.exports = (bot) => {
       "boton_Actas",
       "boton_Vips",
       "boton_Inicio",
+      "boton_Atras_osp",
+      "boton_Inicio",
+      "boton_Siguiente_osp",
+      "boton_Atras_gen",
+      "boton_Atras_gen_2",
+      "boton_Siguiente_gen",
+      "boton_Siguiente_gen_2",
+      "boton_Atras_extra",
+      "boton_Siguiente_extra",
+      "boton_Atras_del",
+      "boton_Siguiente_del",
     ];
 
     const boton_inico = {
       inline_keyboard: [
         [{ text: "[🏠] INICIO", callback_data: "boton_Inicio" }],
+      ],
+    };
+
+    const keyboard_next_osp = {
+      inline_keyboard: [
+        [
+          { text: "←", callback_data: "boton_Atras_osp" },
+          { text: "[🏠] INICIO", callback_data: "boton_Inicio" },
+          { text: "→", callback_data: "boton_Siguiente_osp" },
+        ],
+      ],
+    };
+
+    const keyboard_next_gen = {
+      inline_keyboard: [
+        [
+          { text: "←", callback_data: "boton_Atras_gen" },
+          { text: "[🏠] INICIO", callback_data: "boton_Inicio" },
+          { text: "→", callback_data: "boton_Siguiente_gen" },
+        ],
+      ],
+    };
+
+    const keyboard_next_gen_2 = {
+      inline_keyboard: [
+        [
+          { text: "←", callback_data: "boton_Atras_gen_2" },
+          { text: "[🏠] INICIO", callback_data: "boton_Inicio" },
+          { text: "→", callback_data: "boton_Siguiente_gen_2" },
+        ],
+      ],
+    };
+
+    const keyboard_next_extra = {
+      inline_keyboard: [
+        [
+          { text: "←", callback_data: "boton_Atras_extra" },
+          { text: "[🏠] INICIO", callback_data: "boton_Inicio" },
+          { text: "→", callback_data: "boton_Siguiente_extra" },
+        ],
+      ],
+    };
+
+    const keyboard_next_del = {
+      inline_keyboard: [
+        [
+          { text: "←", callback_data: "boton_Atras_del" },
+          { text: "[🏠] INICIO", callback_data: "boton_Inicio" },
+          { text: "→", callback_data: "boton_Siguiente_del" },
+        ],
       ],
     };
 
@@ -113,15 +174,15 @@ module.exports = (bot) => {
           show_alert: true,
         });
 
-        console.log("SIN PERMISOS");
+        // console.log("SIN PERMISOS");
       } else {
-        console.log("CON PERMISOS en el else...");
+        // console.log("CON PERMISOS en el else...");
 
         let nuevo_Mensaje;
 
         switch (query_action) {
           case "boton_Inicio":
-            console.log("BOTON INICIO..");
+            // console.log("BOTON INICIO..");
             bot
               .editMessageCaption(`${message.command_Message(first_name)}`, {
                 reply_markup: JSON.stringify(keyboard),
@@ -138,7 +199,7 @@ module.exports = (bot) => {
 
           case "boton_Reniec":
             nuevo_Mensaje = message.reniec_Boton();
-            console.log("BOTON RENIEC..");
+            // console.log("BOTON RENIEC..");
             bot.editMessageCaption(nuevo_Mensaje, {
               reply_markup: JSON.stringify(boton_inico),
               message_id: query_messageId,
@@ -147,7 +208,146 @@ module.exports = (bot) => {
 
             break;
 
+          case "boton_Osiptel":
+            nuevo_Mensaje = message.osiptel_Button().message;
+            // console.log("BOTON OSIPTEL..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_osp),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+
+            break;
+
+          case "boton_Siguiente_osp":
+            nuevo_Mensaje = message.osiptel_Button().message_2;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_osp),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Atras_osp":
+            nuevo_Mensaje = message.osiptel_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_osp),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Generador":
+            nuevo_Mensaje = message.generador_Button().message;
+            // console.log("BOTON GENERADOR");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_gen),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Siguiente_gen":
+            try {
+              nuevo_Mensaje = message.generador_Button().message_2;
+              // console.log("BOTON GENERADOR SIGUIENTE");
+              bot.editMessageCaption(nuevo_Mensaje, {
+                reply_markup: JSON.stringify(keyboard_next_gen_2),
+                message_id: query_messageId,
+                chat_id: chatId,
+              });
+              break;
+            } catch (error) {
+              console.log(error);
+            }
+
+          case "boton_Siguiente_gen_2":
+            nuevo_Mensaje = message.generador_Button().message_3;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_gen_2),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Atras_gen_2":
+            nuevo_Mensaje = message.generador_Button().message_2;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_gen),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Atras_gen":
+            nuevo_Mensaje = message.generador_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_gen),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Extras":
+            nuevo_Mensaje = message.extras_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_extra),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Delitos":
+            nuevo_Mensaje = message.delitos_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_extra),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Familia":
+            nuevo_Mensaje = message.familia_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_extra),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Actas":
+            nuevo_Mensaje = message.actas_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_extra),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
+          case "boton_Vips":
+            nuevo_Mensaje = message.vip_Button().message;
+            // console.log("BOTON OSIPTEL 2..");
+            bot.editMessageCaption(nuevo_Mensaje, {
+              reply_markup: JSON.stringify(keyboard_next_extra),
+              message_id: query_messageId,
+              chat_id: chatId,
+            });
+            break;
+
           default:
+            bot.answerCallbackQuery(query_id, {
+              text: "Ya estás en la primera página",
+              // show_alert: true,
+            });
             break;
         }
       }
